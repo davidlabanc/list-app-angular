@@ -1,1 +1,11 @@
-<p>login-page works!</p>
+<div>
+  <label for="new-hero">Hero name: </label>
+  <input id="new-hero" #heroName />
+  <label for="password">Password: </label>
+  <input id="password" type="password" #password />
+
+  <!-- (click) passes input value to add() and then clears the input -->
+  <button type="button" class="add-button" (click)="add(heroName.value, password.value); heroName.value=''">
+    Add hero
+  </button>
+</div>
