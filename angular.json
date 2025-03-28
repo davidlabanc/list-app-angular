@@ -5,7 +5,23 @@
   "projects": {
     "angular-FE": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "path": "src/app/ui"
+        },
+        "@schematics/angular:service": {
+          "path": "src/app/data"
+        },
+        "@schematics/angular:pipe": {
+          "path": "src/app/shared/pipes"
+        },
+        "@schematics/angular:interceptor": {
+          "path": "src/app/core"
+        },
+        "@schematics/angular:layout": {
+          "path": "src/app/ui/layouts"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
