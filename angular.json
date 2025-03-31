@@ -20,7 +20,11 @@
         },
         "@schematics/angular:layout": {
           "path": "src/app/ui/layouts"
+        },
+        "@schematics/angular:directive": {
+          "path": "src/app/shared/directives"
         }
+
       },
       "root": "",
       "sourceRoot": "src",
