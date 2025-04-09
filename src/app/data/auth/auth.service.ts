@@ -1,8 +1,17 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
-import { HttpClient } from '@angular/common/http';
+import {
+  BehaviorSubject,
+  Observable,
+  tap,
+  catchError,
+  of,
+  throwError,
+} from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../../src/environments/environment';
 import { CookieService } from 'ngx-cookie-service';
+import { ApiError } from '../../errors/api-error';
+import { ApiErrorMessage } from '../../interfaces/api-error';
 
 @Injectable({
   providedIn: 'root',
@@ -13,21 +22,22 @@ export class AuthService {
 
   constructor(private http: HttpClient, private cookieService: CookieService) {}
 
-  // login(credentials: { email: string; password: string }){
-  //   console.log(credentials)
-  // }
-
-  login(credentials: { email: string; password: string }): Observable<any> {
+  login(credentials: { email: string; password: string }): Observable<{ token: string; } | ApiError<ApiErrorMessage[]>> {
     console.log(credentials);
     return this.http
-      .post<{ token: string }>(`${environment.API_URL}/api/user/login`, credentials)
+      .post<{ token: string }>(
+        `${environment.API_URL}/api/user/login`,
+        credentials
+      )
       .pipe(
         tap((response) => {
-          console.log("response: ",response);
+          console.log('response: ', response);
           this.cookieService.set(this.authTokenKey, response.token);
           this.authStatus.next(true);
         }),
-        catchError(this.handleError('updateHero', []))
+        catchError((error: HttpErrorResponse) => {
+          return this.handleError('login', error)
+        })
       );
   }
 
@@ -35,17 +45,25 @@ export class AuthService {
     return !!this.cookieService.get(this.authTokenKey);
   }
 
-  private handleError(operation = 'operation', result?: any) {
-    return (error: any): Observable<any> => {
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // TODO: better job of transforming error for user consumption
-      console.log(`${operation} failed: ${error.message}`);
-
-      // Let the app keep running by returning an empty result.
-      return of(result as any);
-    };
+  /*
+   * Expected server response format:
+   * {
+   *   ...HttpErrorResponse,
+   *   error: {
+   *     errors: [
+   *       { msg: string }
+   *     ]
+   *   },
+   *   success: boolean
+   * }
+   */
+  private handleError(operation = 'operation', error: HttpErrorResponse) {
+    if (error.error.errors) {
+      return throwError(() => new ApiError<ApiErrorMessage[]>(error.status, operation, error.error.errors))
+    }else{
+      let errorData = [{ msg: 'An unknown error has occurred!' }];
+      return throwError(() => new ApiError<ApiErrorMessage[]>(error.status, operation, errorData))
+    }
   }
 
   getToken(): string | null {

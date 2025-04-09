@@ -1,5 +1,5 @@
 <div
-  class="flex justify-center p-14 my-52 border border-light-blue m-auto w-1/4 flex-col rounded-2xl"
+  class="flex justify-center p-14 my-52 border border-light-blue m-auto w-1/4 flex-col rounded-2xl min-w-96"
 >
   <form [formGroup]="form">
     <app-input
@@ -18,25 +18,19 @@
       [required]="true"
     ></app-input>
 
-    <div class="flex justify-end">
-      <div class="relative flex">
-        <button
-          type="submit"
-          class="add-button"
-          class="peer rounded-full border border-dark-blue text-dark-blue px-5 py-2 m-1 cursor-pointer font-semibold bg-white group"
-          [ngClass]="{'text-light-blue border-light-blue' : form.invalid}"
-          [disabled]="form.invalid"
-          (click)="submit()"
-        >
-          Submit
-        </button>
-        <div
-          class="input-field absolute top-1 right-1 bottom-1 bg-dark-blue border-white border-2 transition-all rounded-full px-5 py-2 text-dark-blue font-semibold -z-10 peer-hover:bottom-0 peer-hover:right-0"
-          [ngClass]="{'peer-hover:right-1 peer-hover:bottom-1' : form.invalid}"
-          >
-          Submit
-        </div>
-      </div>
+    <div class="flex justify-center w-full" *ngIf="errorData">
+      <ul>
+        <li *ngFor="let error of errorData" class="text-warning">
+          <i class="pi pi-exclamation-triangle px-2"></i>{{ error.msg }}
+        </li>
+      </ul>
     </div>
+
+    <app-form-button
+      [loading]="loading"
+      [disabled]="form.invalid"
+      [text]="'Submit'"
+      [submit]="submit"
+    />
   </form>
 </div>

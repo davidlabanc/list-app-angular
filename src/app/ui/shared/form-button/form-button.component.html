@@ -1,15 +1,28 @@
-<div class="flex justify-end relative">
-  <button
-    type="button"
-    class="add-button"
-    class="peer rounded-full border border-dark-blue text-dark-blue px-5 py-2 m-1 cursor-pointer font-semibold bg-white group"
-  >
-    Submit
-  </button>
-  <div
-    class="rounded-full text-dark-blue px-5 py-2 cursor-pointer font-semibold absolute bottom-1 right-1
-     peer-hover:right-0 peer-hover:bottom-0 -z-10 transition-all submit-button"
-  >
-    Submit
+<div class="flex justify-end">
+  <div class="relative flex">
+    <button
+      type="submit"
+      class="add-button"
+      class="peer rounded-full border border-dark-blue text-dark-blue px-5 py-2 m-1 cursor-pointer font-semibold bg-white group inline-flex items-center justify-center"
+      [ngClass]="{ 'text-light-blue border-light-blue': disabled }"
+      [disabled]="disabled"
+      (click)="submit()"
+    >
+      <i
+        class="pi pi-spinner animate-spin text-warning mr-2 -ml-2 w-0 overflow-hidden transition-[width]"
+        [ngClass]="{ 'w-auto': loading }"
+      ></i>
+      Submit
+    </button>
+    <div
+      class="flex items-center input-field absolute top-1 right-1 bottom-1 bg-dark-blue border-white border-2 transition-all rounded-full px-5 py-2 text-dark-blue font-semibold -z-10 peer-hover:bottom-0 peer-hover:right-0"
+      [ngClass]="{ 'peer-hover:right-1 peer-hover:bottom-1': disabled }"
+    >
+      <i
+        class="pi pi-spinner animate-spin text-warning mr-2 -ml-2 w-0 overflow-hidden"
+        [ngClass]="{ 'w-auto': loading }"
+      ></i>
+      Submit
+    </div>
   </div>
 </div>

@@ -8,11 +8,23 @@ import {
   Validators,
 } from '@angular/forms';
 import { AutofocusDirective } from '../../../shared/directives/autofocus.directive';
-import { NgClass } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
+import { ApiError } from '../../../errors/api-error';
+import { ApiErrorMessage } from '../../../interfaces/api-error';
+import { finalize } from 'rxjs';
+import { Router } from '@angular/router';
+import { FormButtonComponent } from '../../shared/form-button/form-button.component';
 
 @Component({
   selector: 'app-login-page',
-  imports: [InputComponent, ReactiveFormsModule, AutofocusDirective, NgClass],
+  imports: [
+    InputComponent,
+    ReactiveFormsModule,
+    AutofocusDirective,
+    NgFor,
+    NgIf,
+    FormButtonComponent
+  ],
   templateUrl: './login-page.component.html',
   styleUrl: './login-page.component.css',
 })
@@ -22,17 +34,33 @@ export class LoginPageComponent {
     password: new FormControl('', []),
   });
 
-  constructor(private authService: AuthService) {}
+  errorData: any = [];
+  loading: boolean = false;
 
-  submit() {
-    if (this.form.valid) {
-      let {email, password = ''} = this.form.value
-      console.log('Form Submitted:', );
-      this.authService.login({ email: email || '', password: password || ''}).subscribe();
-    }
+  constructor(private authService: AuthService, private router: Router) {
+    this.submit = this.submit.bind(this);
   }
 
-  login(email: string, password: string): void {
-    
+  submit() {
+    console.log('Button clicked', this.form);
+    if (this.form.valid) {
+      this.loading = true;
+      let { email, password = '' } = this.form.value;
+
+      // console.log('Form Submitted:');
+
+      this.authService
+        .login({ email: email || '', password: password || '' })
+        .pipe(finalize(() => (this.loading = false)))
+        .subscribe({
+          next: () =>  this.router.navigate(['/dashboard']),
+          error: (error: ApiError<ApiErrorMessage[]>) => {
+            // console.log('Status:', error.status);
+            // console.log('Error Data:', error.errorData);
+            // console.log('Error:', error);
+            this.errorData = error.errorData;
+          },
+        });
+    }
   }
 }
